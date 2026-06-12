@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generate beautiful and customizable QR codes instantly.">
+    <title>Dynamic QR Code Generator</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-content">
+            <div class="logo">QR Gen Pro</div>
+            <div class="nav-links">
+                <a href="#generator">Create</a>
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#compare">Compare</a>
+            </div>
+            <div class="user-menu-container">
+                <button id="user-menu-btn" class="nav-btn">Login</button>
+                <div id="user-dropdown" class="user-dropdown hidden panel-glass">
+                    <a href="#" id="drop-login">Login / Sign Up</a>
+                    <a href="#" id="drop-settings" style="display: none;">Account Settings</a>
+                    <a href="#" id="drop-logout" style="display: none;">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section id="generator" class="app-container hero-section">
+            <header class="app-header">
+                <h1>QR Generator</h1>
+                <p>Create beautiful custom QR codes in seconds</p>
+            </header>
+
+            <section class="generator-layout">
+                <div class="controls-panel panel-glass">
+                    <div class="input-group">
+                        <label for="qr-data">Enter URL or Text</label>
+                        <textarea id="qr-data" placeholder="e.g. https://google.com" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="customization-grid">
+                        <div class="input-group feature-locked" id="lock-fg">
+                            <label for="color-dark">Foreground <span class="premium-badge">PRO</span></label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" id="color-dark" value="#0f172a" disabled>
+                                <span class="color-value" id="color-dark-val">#0f172a</span>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group feature-locked" id="lock-bg">
+                            <label for="color-light">Background <span class="premium-badge">PRO</span></label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" id="color-light" value="#ffffff" disabled>
+                                <span class="color-value" id="color-light-val">#ffffff</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="qr-size">Size: <span id="size-label">256</span>px</label>
+                        <input type="range" id="qr-size" min="100" max="500" value="256" step="10">
+                    </div>
+                </div>
+
+                <div class="preview-panel panel-glass">
+                    <div class="qr-wrapper" id="qr-wrapper">
+                        <!-- QR Code will be injected here -->
+                        <div id="qrcode"></div>
+                        <div class="placeholder-overlay" id="placeholder-overlay">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-qr-code"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+                            <p>Awaiting Input...</p>
+                        </div>
+                    </div>
+                    
+                    <button id="download-btn" class="primary-btn feature-locked" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        Download <span class="premium-badge inline-badge">PRO</span>
+                    </button>
+                </div>
+            </section>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="info-section">
+            <div class="section-container">
+                <h2 class="section-title">Why Use QR Codes?</h2>
+                <p class="section-subtitle">Supercharge your business with seamless offline-to-online connections.</p>
+                <div class="features-grid">
+                    <div class="feature-card panel-glass">
+                        <div class="feature-icon">🚀</div>
+                        <h3>Instant Access</h3>
+                        <p>Direct customers instantly to your website, menus, or promotional offers without typing URLs.</p>
+                    </div>
+                    <div class="feature-card panel-glass">
+                        <div class="feature-icon">📊</div>
+                        <h3>Trackable Analytics</h3>
+                        <p>Measure scan locations, times, and devices to optimize your marketing campaigns in real time.</p>
+                    </div>
+                    <div class="feature-card panel-glass">
+                        <div class="feature-icon">🎨</div>
+                        <h3>Brand Identity</h3>
+                        <p>Customize your codes with your brand colors and logos to ensure trust and higher scan rates.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="info-section">
+            <div class="section-container">
+                <h2 class="section-title">Transparent Pricing</h2>
+                <p class="section-subtitle">No hidden fees. Month-to-month billing. Cancel anytime.</p>
+                
+                <div class="pricing-cards-container page-pricing">
+                    <!-- Starter Plan -->
+                    <div class="pricing-card panel-glass">
+                        <h3 class="plan-name">Starter</h3>
+                        <div class="price">
+                            <span class="currency">$</span><span class="amount">7</span><span class="period">/mo</span>
+                        </div>
+                        <ul class="features-list">
+                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Custom Colors</li>
+                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> 5 Dynamic Codes</li>
+                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Basic Analytics</li>
+                        </ul>
+                        <button class="primary-btn premium-btn subscribe-btn">Get Starter</button>
+                    </div>
+
+                    <!-- Professional Plan -->
+                    <div class="pricing-card popular panel-glass">
+                        <div class="popular-badge">Most Popular</div>
+                        <h3 class="plan-name">Professional</h3>
+                        <div class="price">
+                            <span class="currency">$</span><span class="amount">19</span><span class="period">/mo</span>
+                        </div>
+                        <ul class="features-list">
+                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> High-Res PNG/SVG</li>
+                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited Codes</li>
+                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Priority Support</li>
+                        </ul>
+                        <button class="primary-btn premium-btn subscribe-btn">Get Professional</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Compare Section -->
+        <section id="compare" class="info-section">
+            <div class="section-container">
+                <h2 class="section-title">How We Compare</h2>
+                <p class="section-subtitle">Get the premium features you need at a fraction of the cost.</p>
+                
+                <div class="table-container panel-glass">
+                    <table class="compare-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>QR Gen Pro</th>
+                                <th>Bitly / Others</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Starting Price</td>
+                                <td class="highlight-cell">$7 / month</td>
+                                <td>$15 - $35 / month</td>
+                            </tr>
+                            <tr>
+                                <td>Pro Features</td>
+                                <td class="highlight-cell">$19 / month</td>
+                                <td>$40 - $100+ / month</td>
+                            </tr>
+                            <tr>
+                                <td>Dynamic Codes</td>
+                                <td class="highlight-cell">Included</td>
+                                <td>Often Restricted</td>
+                            </tr>
+                            <tr>
+                                <td>High-Res Exports</td>
+                                <td class="highlight-cell">Included</td>
+                                <td>Premium Only</td>
+                            </tr>
+                            <tr>
+                                <td>Custom Colors</td>
+                                <td class="highlight-cell">Included</td>
+                                <td>Premium Only</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Login/Signup Modal -->
+    <div class="modal-overlay" id="login-modal">
+        <div class="modal-content panel-glass">
+            <button class="close-modal" id="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2 id="auth-title">Welcome Back</h2>
+                <p id="auth-subtitle">Sign in to your account.</p>
+            </div>
+            <form id="login-form">
+                <div id="signup-fields" class="signup-fields" style="display: none;">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="first-name">First Name</label>
+                            <input type="text" id="first-name" placeholder="John">
+                        </div>
+                        <div class="input-group">
+                            <label for="last-name">Last Name</label>
+                            <input type="text" id="last-name" placeholder="Doe">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" placeholder="+1 (555) 000-0000">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="you@example.com" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+                <div id="auth-error" class="auth-error" style="color: #ef4444; font-size: 0.9rem; display: none;"></div>
+                <button type="submit" class="primary-btn" id="submit-login">
+                    Sign In
+                </button>
+            </form>
+            <p class="modal-footer"><span id="auth-switch-text">Don't have an account?</span> <a href="#" id="auth-switch-link">Sign Up</a></p>
+        </div>
+    </div>
+
+    <!-- Checkout/Pricing Modal -->
+    <div class="modal-overlay" id="checkout-modal">
+        <div class="modal-content panel-glass checkout-content" style="max-width: 650px;">
+            <button class="close-modal" id="close-checkout-modal">&times;</button>
+            <div class="modal-header">
+                <h2>Choose Your Plan</h2>
+                <p>Unlock custom colors and high-res downloads.</p>
+            </div>
+            
+            <div class="pricing-cards-container">
+                <!-- Starter Plan -->
+                <div class="pricing-card">
+                    <h3 class="plan-name">Starter</h3>
+                    <div class="price">
+                        <span class="currency">$</span><span class="amount">7</span><span class="period">/mo</span>
+                    </div>
+                    <ul class="features-list">
+                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Custom Colors</li>
+                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> 5 Dynamic Codes</li>
+                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Basic Analytics</li>
+                    </ul>
+                    <button class="primary-btn premium-btn subscribe-btn">
+                        Get Starter
+                    </button>
+                </div>
+
+                <!-- Professional Plan -->
+                <div class="pricing-card popular">
+                    <div class="popular-badge">Most Popular</div>
+                    <h3 class="plan-name">Professional</h3>
+                    <div class="price">
+                        <span class="currency">$</span><span class="amount">19</span><span class="period">/mo</span>
+                    </div>
+                    <ul class="features-list">
+                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> High-Res PNG/SVG</li>
+                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited Codes</li>
+                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Priority Support</li>
+                    </ul>
+                    <button class="primary-btn premium-btn subscribe-btn">
+                        Get Professional
+                    </button>
+                </div>
+            </div>
+            <p class="modal-footer" style="font-size: 0.8rem; opacity: 0.7;">Month-to-month billing. Cancel anytime.</p>
+        </div>
+    </div>
+
+    <!-- Account Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-content panel-glass" style="max-width: 500px;">
+            <button class="close-modal" id="close-settings-modal">&times;</button>
+            <div class="modal-header" style="margin-bottom: 1.5rem;">
+                <h2>Account Settings</h2>
+                <p>Manage your profile and subscription.</p>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Subscription</h3>
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);">Current Plan: <strong id="current-plan-text" style="color: var(--text-primary);">Starter</strong></p>
+                <button id="manage-sub-btn" class="primary-btn premium-btn" style="width: auto; padding: 0.5rem 1.5rem; font-size: 0.95rem;">Manage Subscription</button>
+            </div>
+
+            <div class="settings-section">
+                <h3>Profile Details</h3>
+                <div class="input-group" style="margin-bottom: 1rem;">
+                    <label for="settings-email">Email</label>
+                    <input type="email" id="settings-email">
+                </div>
+                <div class="input-group" style="margin-bottom: 1.5rem;">
+                    <label for="settings-phone">Phone Number</label>
+                    <input type="tel" id="settings-phone">
+                </div>
+                <button id="update-profile-btn" class="primary-btn" style="width: auto; padding: 0.5rem 1.5rem; font-size: 0.95rem;">Update Profile</button>
+            </div>
+
+            <div class="settings-section">
+                <h3>Security</h3>
+                <div class="input-group" style="margin-bottom: 1.5rem;">
+                    <label for="settings-password">New Password</label>
+                    <input type="password" id="settings-password" placeholder="••••••••">
+                </div>
+                <button id="update-password-btn" class="primary-btn" style="width: auto; padding: 0.5rem 1.5rem; font-size: 0.95rem;">Update Password</button>
+            </div>
+            
+            <div id="settings-msg" style="margin-top: 1.5rem; text-align: center; display: none; font-weight: 500; padding: 0.5rem; border-radius: 8px;"></div>
+        </div>
+    </div>
+    <!-- Saved Codes Modal -->
+    <div class="modal-overlay" id="saved-codes-modal">
+        <div class="modal-content panel-glass" style="max-width: 600px;">
+            <button class="close-modal" id="close-saved-modal">&times;</button>
+            <div class="modal-header">
+                <h2>My Saved Codes</h2>
+                <p>Load or delete your previously saved QR configurations.</p>
+            </div>
+            <div id="saved-codes-list" class="saved-codes-list">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Terms of Service Modal -->
+    <div class="modal-overlay" id="tos-modal">
+        <div class="modal-content panel-glass" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+            <button class="close-modal" id="close-tos-modal">&times;</button>
+            <div class="modal-header">
+                <h2>Terms of Service</h2>
+                <p>Last updated: June 2026</p>
+            </div>
+            <div class="tos-content" style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">
+                <p>By using our dynamic QR code generator, you agree to these terms.</p>
+                <br>
+                <h3>1. Subscription and Billing</h3>
+                <p>You will be billed monthly for your chosen tier. You may cancel at any time through your account settings. Payments are securely processed via our payment partners.</p>
+                <br>
+                <h3>2. Service Availability</h3>
+                <p>We strive for 99.9% uptime, but we do not guarantee the service will be entirely free of interruptions or bugs. Maintenance windows will be announced in advance.</p>
+                <br>
+                <h3>3. Prohibited Content</h3>
+                <p>You may not use our QR codes to link to malicious, illegal, or harmful content. Accounts found violating this policy will be terminated immediately without refund.</p>
+                <br>
+                <h3>4. Data Privacy</h3>
+                <p>We respect your privacy. All saved QR configurations are securely tied to your user account and are not shared with third parties.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- QRCode.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Custom JS -->
+    <script src="script.js"></script>
+</body>
+</html>
