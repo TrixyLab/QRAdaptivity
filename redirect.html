@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.1);
+            border-top: 5px solid #6366f1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div class="spinner"></div>
+        <h2>Routing you securely...</h2>
+        <p id="error-msg" style="color: #ef4444; display: none; margin-top: 1rem;"></p>
+    </div>
+
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            const errorMsg = document.getElementById('error-msg');
+
+            if (!id) {
+                errorMsg.textContent = "Invalid tracking link.";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            // Supabase Config
+            const SUPABASE_URL = 'https://cbadwzlkfzmpcmwryxwx.supabase.co';
+            const SUPABASE_KEY = 'sb_publishable_1DjrAV9oSAIe7UJoHcdsrQ_6BCI2sCE';
+            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+            try {
+                // 1. Fetch the destination URL using rpc function
+                // Note: incrementing and selecting should ideally happen securely,
+                // but for this static app we'll do two operations.
+                
+                // First, fetch the target
+                const { data, error } = await supabase
+                    .from('saved_qrs')
+                    .select('text, scan_count')
+                    .eq('id', id)
+                    .single();
+
+                if (error || !data) {
+                    errorMsg.textContent = "QR Code not found or has been deleted.";
+                    errorMsg.style.display = 'block';
+                    return;
+                }
+
+                // Increment the counter
+                // Note: The user's database should ideally have an RPC or allow public updates to `scan_count`. 
+                // Since RLS is probably loose or not strict, we will try to update it. 
+                // If it fails (due to permissions), we will still redirect.
+                await supabase
+                    .from('saved_qrs')
+                    .update({ scan_count: (data.scan_count || 0) + 1 })
+                    .eq('id', id);
+
+                // Redirect
+                window.location.href = data.text;
+                
+            } catch (err) {
+                console.error(err);
+                errorMsg.textContent = "An error occurred while routing.";
+                errorMsg.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

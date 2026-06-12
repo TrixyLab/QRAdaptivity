@@ -42,13 +42,92 @@
 
             <section class="generator-layout">
                 <div class="controls-panel panel-glass">
-                    <div class="input-group">
-                        <label for="qr-data">Enter URL or Text</label>
-                        <textarea id="qr-data" placeholder="e.g. https://google.com" rows="3"></textarea>
+                    <!-- Template Tabs -->
+                    <div class="tabs-container">
+                        <button class="tab-btn active" data-tab="text">Link / Text</button>
+                        <button class="tab-btn" data-tab="wifi">WiFi</button>
+                        <button class="tab-btn" data-tab="email">Email</button>
+                        <button class="tab-btn" data-tab="vcard">vCard</button>
                     </div>
-                    
+
+                    <!-- Tab Contents -->
+                    <div class="tab-content active" id="tab-text">
+                        <div class="input-group">
+                            <label for="qr-data">Enter URL or Text</label>
+                            <textarea id="qr-data" class="qr-data-input" placeholder="e.g. https://google.com" rows="3"></textarea>
+                        </div>
+                        <div class="input-group" style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; background: rgba(15,23,42,0.4); padding: 0.75rem; border-radius: 8px;">
+                            <input type="checkbox" id="is-dynamic" style="width: 1.2rem; height: 1.2rem; cursor: pointer;">
+                            <div style="display: flex; flex-direction: column;">
+                                <label for="is-dynamic" style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                                    Make Dynamic (Track Scans) <span class="premium-badge inline-badge">PRO</span>
+                                </label>
+                                <span style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">Requires URL input. Scans route through our server for analytics.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tab-wifi" style="display: none;">
+                        <div class="input-group">
+                            <label>Network Name (SSID)</label>
+                            <input type="text" id="wifi-ssid" class="qr-data-input" placeholder="My Network">
+                        </div>
+                        <div class="input-group">
+                            <label>Password</label>
+                            <input type="text" id="wifi-pass" class="qr-data-input" placeholder="Password123">
+                        </div>
+                        <div class="input-group">
+                            <label>Encryption</label>
+                            <select id="wifi-enc" class="qr-data-input" style="background: rgba(15,23,42,0.4); color: white; border: 1px solid var(--panel-border); padding: 0.8rem; border-radius: 8px; width: 100%;">
+                                <option value="WPA">WPA/WPA2</option>
+                                <option value="WEP">WEP</option>
+                                <option value="nopass">None</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tab-email" style="display: none;">
+                        <div class="input-group">
+                            <label>Email Address</label>
+                            <input type="email" id="email-to" class="qr-data-input" placeholder="hello@example.com">
+                        </div>
+                        <div class="input-group">
+                            <label>Subject</label>
+                            <input type="text" id="email-sub" class="qr-data-input" placeholder="Inquiry">
+                        </div>
+                        <div class="input-group">
+                            <label>Message</label>
+                            <textarea id="email-msg" class="qr-data-input" rows="2" placeholder="Hi there..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tab-vcard" style="display: none;">
+                        <div style="display:flex; gap:0.5rem;">
+                            <div class="input-group" style="flex:1;">
+                                <label>First Name</label>
+                                <input type="text" id="vc-fname" class="qr-data-input" placeholder="John">
+                            </div>
+                            <div class="input-group" style="flex:1;">
+                                <label>Last Name</label>
+                                <input type="text" id="vc-lname" class="qr-data-input" placeholder="Doe">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Phone</label>
+                            <input type="tel" id="vc-phone" class="qr-data-input" placeholder="+1 555 0000">
+                        </div>
+                        <div class="input-group">
+                            <label>Email</label>
+                            <input type="email" id="vc-email" class="qr-data-input" placeholder="john@example.com">
+                        </div>
+                        <div class="input-group">
+                            <label>Website</label>
+                            <input type="url" id="vc-url" class="qr-data-input" placeholder="https://johndoe.com">
+                        </div>
+                    </div>
+
                     <div class="customization-grid">
-                        <div class="input-group feature-locked" id="lock-fg">
+                        <div class="input-group feature-locked lock-style" id="lock-fg">
                             <label for="color-dark">Foreground <span class="premium-badge">PRO</span></label>
                             <div class="color-picker-wrapper">
                                 <input type="color" id="color-dark" value="#0f172a" disabled>
@@ -56,13 +135,41 @@
                             </div>
                         </div>
                         
-                        <div class="input-group feature-locked" id="lock-bg">
+                        <div class="input-group feature-locked lock-style" id="lock-bg">
                             <label for="color-light">Background <span class="premium-badge">PRO</span></label>
                             <div class="color-picker-wrapper">
                                 <input type="color" id="color-light" value="#ffffff" disabled>
                                 <span class="color-value" id="color-light-val">#ffffff</span>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="customization-grid" style="margin-top: 1rem;">
+                        <div class="input-group feature-locked lock-style" id="lock-dots">
+                            <label>Dot Style <span class="premium-badge">PRO</span></label>
+                            <select id="dot-style" class="qr-style-select" disabled>
+                                <option value="square">Square</option>
+                                <option value="dots">Dots</option>
+                                <option value="rounded">Rounded</option>
+                                <option value="classy">Classy</option>
+                                <option value="classy-rounded">Classy Rounded</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group feature-locked lock-style" id="lock-corner">
+                            <label>Corner Style <span class="premium-badge">PRO</span></label>
+                            <select id="corner-style" class="qr-style-select" disabled>
+                                <option value="square">Square</option>
+                                <option value="dot">Dot</option>
+                                <option value="extra-rounded">Extra Rounded</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group feature-locked lock-style" id="lock-logo" style="margin-top: 1rem;">
+                        <label>Center Logo <span class="premium-badge">PRO</span></label>
+                        <input type="file" id="logo-input" accept="image/png, image/jpeg" style="background: rgba(15,23,42,0.4); padding: 0.5rem; border-radius: 8px; font-size: 0.9rem; color: white;" disabled>
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">Max 1MB. Transparent PNG works best.</p>
                     </div>
 
                     <div class="input-group">
@@ -374,8 +481,8 @@
 
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- QRCode.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- QR Code Styling Library -->
+    <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
     <!-- Custom JS -->
     <script src="script.js"></script>
 </body>

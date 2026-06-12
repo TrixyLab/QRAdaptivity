@@ -49,20 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutModal = document.getElementById('checkout-modal');
     const closeCheckoutModalBtn = document.getElementById('close-checkout-modal');
     const subscribeBtns = document.querySelectorAll('.subscribe-btn');
-
-    // New Cart & TOS Elements
-    const cartModal = document.getElementById('cart-modal');
-    const closeCartModalBtn = document.getElementById('close-cart-modal');
-    const tosModal = document.getElementById('tos-modal');
-    const closeTosModalBtn = document.getElementById('close-tos-modal');
-    const openTosLink = document.getElementById('open-tos');
-    const tosCheckbox = document.getElementById('tos-checkbox');
-    const cartMsg = document.getElementById('cart-msg');
-    
-    // Pay Buttons
-    const applePayBtn = document.getElementById('apple-pay-btn');
-    const googlePayBtn = document.getElementById('google-pay-btn');
-    const payCardBtn = document.getElementById('pay-card-btn');
     
     // Saved Codes Elements
     const savedCodesModal = document.getElementById('saved-codes-modal');
@@ -384,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUIForAuth();
     });
 
-    // --- Checkout, Cart, and TOS Logic ---
+    // --- Checkout Logic ---
     const openCheckoutModal = () => {
         checkoutModal.classList.add('active');
     };
@@ -395,7 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     closeCheckoutModalBtn.addEventListener('click', closeCheckoutModal);
 
-    // Clicking a subscribe button opens the Cart Modal
+    // Clicking a subscribe button redirects to Stripe
     subscribeBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             if (!isLoggedIn) {
@@ -403,58 +389,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 openModal();
                 return;
             }
-            closeCheckoutModal();
-            cartModal.classList.add('active');
+            
+            // NOTE TO USER: Put your Stripe Payment Link URL here!
+            // E.g. 'https://buy.stripe.com/test_...'
+            const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/REPLACE_ME';
+            
+            const email = currentUser?.email || '';
+            const finalUrl = `${STRIPE_PAYMENT_LINK}?prefilled_email=${encodeURIComponent(email)}`;
+            
+            window.location.href = finalUrl;
         });
     });
-
-    closeCartModalBtn.addEventListener('click', () => {
-        cartModal.classList.remove('active');
-    });
-
-    openTosLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        tosModal.classList.add('active');
-    });
-
-    closeTosModalBtn.addEventListener('click', () => {
-        tosModal.classList.remove('active');
-    });
-
-    // Checkbox toggles pay buttons
-    tosCheckbox.addEventListener('change', (e) => {
-        const isChecked = e.target.checked;
-        applePayBtn.disabled = !isChecked;
-        googlePayBtn.disabled = !isChecked;
-        
-        // Mock card validation (basic)
-        payCardBtn.disabled = !isChecked; 
-    });
-
-    // Mock Payment Processing
-    const processPayment = (btnElement, originalText) => {
-        btnElement.textContent = 'Processing...';
-        applePayBtn.disabled = true;
-        googlePayBtn.disabled = true;
-        payCardBtn.disabled = true;
-        
-        setTimeout(() => {
-            isPro = true;
-            localStorage.setItem('is_pro', 'true');
-            cartModal.classList.remove('active');
-            updateUIForAuth();
-            
-            btnElement.textContent = originalText;
-            applePayBtn.disabled = false;
-            googlePayBtn.disabled = false;
-            payCardBtn.disabled = false;
-            tosCheckbox.checked = false;
-        }, 2000);
-    };
-
-    applePayBtn.addEventListener('click', (e) => processPayment(e.target, 'Apple Pay'));
-    googlePayBtn.addEventListener('click', (e) => processPayment(e.target, 'Google Pay'));
-    payCardBtn.addEventListener('click', (e) => processPayment(e.target, 'Pay with Card'));
 
     // --- Saved QR Codes Logic ---
     dropSaved.addEventListener('click', (e) => {
@@ -492,10 +437,20 @@ document.addEventListener('DOMContentLoaded', () => {
         data.forEach(item => {
             const el = document.createElement('div');
             el.className = 'saved-code-item';
+            
+            const config = item.styling_config || {};
+            const typeBadge = item.is_dynamic ? `<span class="premium-badge inline-badge" style="background:#8b5cf6;">DYNAMIC</span>` : `<span class="premium-badge inline-badge" style="background:#10b981;">STATIC</span>`;
+            const scansStr = item.is_dynamic ? `<span style="margin-left: 0.5rem; font-size:0.8rem; color:var(--text-secondary);">Scans: <strong style="color:white;">${item.scan_count || 0}</strong></span>` : '';
+
             el.innerHTML = `
                 <div class="saved-code-info">
-                    <span class="saved-code-text">${item.text}</span>
-                    <span class="saved-code-date">${new Date(item.created_at).toLocaleDateString()}</span>
+                    <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                        ${typeBadge}
+                        <span style="font-size:0.8rem; text-transform:uppercase; color:var(--text-secondary);">${item.format_type || 'text'}</span>
+                        ${scansStr}
+                    </div>
+                    <span class="saved-code-text" title="${item.text}" style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:250px;">${item.text}</span>
+                    <span class="saved-code-date" style="display:block; margin-top:0.25rem;">${new Date(item.created_at).toLocaleDateString()}</span>
                 </div>
                 <div class="saved-code-actions">
                     <button class="secondary-btn load-code-btn">Load</button>
@@ -504,12 +459,34 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             
             el.querySelector('.load-code-btn').addEventListener('click', () => {
-                dataInput.value = item.text;
+                document.getElementById('qr-data').value = item.text;
+                if (document.getElementById('is-dynamic')) document.getElementById('is-dynamic').checked = item.is_dynamic || false;
+                
                 sizeInput.value = item.size;
                 colorDarkInput.value = item.color_dark;
                 colorLightInput.value = item.color_light;
+                
+                if (document.getElementById('dot-style') && config.dotStyle) document.getElementById('dot-style').value = config.dotStyle;
+                if (document.getElementById('corner-style') && config.cornerStyle) document.getElementById('corner-style').value = config.cornerStyle;
+                
+                const tabs = document.querySelectorAll('.tab-btn');
+                const tabContents = document.querySelectorAll('.tab-content');
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.style.display = 'none');
+                
+                const formatTab = document.querySelector(`[data-tab="${item.format_type || 'text'}"]`);
+                if (formatTab) formatTab.classList.add('active');
+                const tabContent = document.getElementById(`tab-${item.format_type || 'text'}`);
+                if (tabContent) tabContent.style.display = 'block';
+                activeTab = item.format_type || 'text';
+
                 savedCodesModal.classList.remove('active');
                 updateQRCode();
+                
+                if (item.is_dynamic) {
+                    const trackingUrl = `${window.location.origin}/redirect.html?id=${item.id}`;
+                    qrcode.update({ data: trackingUrl });
+                }
             });
             
             el.querySelector('.delete-code-btn').addEventListener('click', async (e) => {
@@ -526,22 +503,35 @@ document.addEventListener('DOMContentLoaded', () => {
     saveBtn.addEventListener('click', async () => {
         if (!isLoggedIn || !currentUser) return;
         
-        const text = dataInput.value.trim();
+        const text = getFormattedData();
         if (!text) return;
+        
+        const isDynamic = document.getElementById('is-dynamic') && document.getElementById('is-dynamic').checked;
+        const dotStyle = document.getElementById('dot-style') ? document.getElementById('dot-style').value : 'square';
+        const cornerStyle = document.getElementById('corner-style') ? document.getElementById('corner-style').value : 'square';
         
         saveBtn.textContent = 'Saving...';
         saveBtn.disabled = true;
         
-        const { error } = await supabase.from('saved_qrs').insert({
+        const { data, error } = await supabase.from('saved_qrs').insert({
             user_id: currentUser.id,
             text: text,
             color_dark: colorDarkInput.value,
             color_light: colorLightInput.value,
-            size: parseInt(sizeInput.value)
-        });
+            size: parseInt(sizeInput.value),
+            is_dynamic: isDynamic,
+            format_type: activeTab,
+            styling_config: { dotStyle, cornerStyle }
+        }).select();
         
-        if (!error) {
+        if (!error && data && data.length > 0) {
             saveBtn.textContent = 'Saved!';
+            
+            if (isDynamic) {
+                const trackingUrl = `${window.location.origin}/redirect.html?id=${data[0].id}`;
+                qrcode.update({ data: trackingUrl });
+            }
+
             setTimeout(() => {
                 saveBtn.textContent = 'Save';
                 saveBtn.disabled = false;
@@ -571,12 +561,46 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('lock-bg').addEventListener('click', handleColorClick);
 
     // --- QR Generation Logic ---
+    let activeTab = 'text';
+
+    const getFormattedData = () => {
+        if (activeTab === 'text') {
+            return document.getElementById('qr-data').value.trim();
+        } else if (activeTab === 'wifi') {
+            const ssid = document.getElementById('wifi-ssid').value.trim();
+            const pass = document.getElementById('wifi-pass').value;
+            const enc = document.getElementById('wifi-enc').value;
+            if (!ssid) return '';
+            return `WIFI:T:${enc};S:${ssid};P:${pass};;`;
+        } else if (activeTab === 'email') {
+            const to = document.getElementById('email-to').value.trim();
+            const sub = document.getElementById('email-sub').value;
+            const msg = document.getElementById('email-msg').value;
+            if (!to) return '';
+            return `mailto:${to}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(msg)}`;
+        } else if (activeTab === 'vcard') {
+            const fname = document.getElementById('vc-fname').value.trim();
+            const lname = document.getElementById('vc-lname').value.trim();
+            const phone = document.getElementById('vc-phone').value;
+            const email = document.getElementById('vc-email').value;
+            const url = document.getElementById('vc-url').value;
+            if (!fname) return '';
+            return `BEGIN:VCARD\nVERSION:3.0\nN:${lname};${fname};;;\nFN:${fname} ${lname}\nTEL:${phone}\nEMAIL:${email}\nURL:${url}\nEND:VCARD`;
+        }
+        return '';
+    };
 
     const updateQRCode = () => {
-        const text = dataInput.value.trim();
+        const text = getFormattedData();
         const size = parseInt(sizeInput.value);
         const colorDark = colorDarkInput.value;
         const colorLight = colorLightInput.value;
+        
+        const dotStyleSelect = document.getElementById('dot-style');
+        const cornerStyleSelect = document.getElementById('corner-style');
+        
+        const dotStyle = dotStyleSelect ? dotStyleSelect.value : 'square';
+        const cornerStyle = cornerStyleSelect ? cornerStyleSelect.value : 'square';
 
         // Update UI Labels
         sizeLabel.textContent = size;
@@ -599,27 +623,42 @@ document.addEventListener('DOMContentLoaded', () => {
         placeholderOverlay.style.opacity = '0';
         placeholderOverlay.style.pointerEvents = 'none';
         
-        // Ensure download button visually enabled if content exists, 
-        // click handler will handle auth/pro gates
         downloadBtn.disabled = false;
         if (saveBtn) saveBtn.disabled = false;
 
-        // Clear previous QR code
         qrcodeContainer.innerHTML = '';
 
-        // Apply a small animation on generation
         qrcodeContainer.style.animation = 'none';
-        void qrcodeContainer.offsetWidth; // Trigger reflow
+        void qrcodeContainer.offsetWidth;
         qrcodeContainer.style.animation = 'fadeIn 0.5s ease-out';
 
-        qrcode = new QRCode(qrcodeContainer, {
-            text: text,
+        const qrOptions = {
             width: size,
             height: size,
-            colorDark: colorDark,
-            colorLight: colorLight,
-            correctLevel: QRCode.CorrectLevel.H
-        });
+            data: text,
+            dotsOptions: {
+                color: colorDark,
+                type: dotStyle
+            },
+            backgroundOptions: {
+                color: colorLight,
+            },
+            cornersSquareOptions: {
+                type: cornerStyle
+            }
+        };
+
+        if (loadedLogo) {
+            qrOptions.image = loadedLogo;
+            qrOptions.imageOptions = {
+                crossOrigin: "anonymous",
+                margin: 5
+            };
+        }
+
+        qrcode = new QRCodeStyling(qrOptions);
+
+        qrcode.append(qrcodeContainer);
     };
 
     // Download Handler
@@ -634,30 +673,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const img = qrcodeContainer.querySelector('img');
-        const canvas = qrcodeContainer.querySelector('canvas');
-        
-        if (!img && !canvas) return;
-        
-        let url = '';
-        if (img && img.src) {
-            url = img.src;
-        } else if (canvas) {
-            url = canvas.toDataURL("image/png");
-        }
-
-        if (url) {
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `qrcode-${Date.now()}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        if (qrcode) {
+            qrcode.download({ name: `qrcode-${Date.now()}`, extension: "png" });
         }
     };
 
     // Event Listeners
-    dataInput.addEventListener('input', updateQRCode);
     sizeInput.addEventListener('input', updateQRCode);
     
     closeModal.addEventListener('click', closeLoginModal);
@@ -666,6 +687,52 @@ document.addEventListener('DOMContentLoaded', () => {
     
     colorDarkInput.addEventListener('input', updateQRCode);
     colorLightInput.addEventListener('input', updateQRCode);
+
+    // All dynamic data inputs
+    document.querySelectorAll('.qr-data-input').forEach(input => {
+        input.addEventListener('input', updateQRCode);
+    });
+
+    const dotStyleSelect = document.getElementById('dot-style');
+    const cornerStyleSelect = document.getElementById('corner-style');
+    const logoInput = document.getElementById('logo-input');
+
+    if (dotStyleSelect) dotStyleSelect.addEventListener('change', updateQRCode);
+    if (cornerStyleSelect) cornerStyleSelect.addEventListener('change', updateQRCode);
+
+    let loadedLogo = null;
+    if (logoInput) {
+        logoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) {
+                loadedLogo = null;
+                updateQRCode();
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                loadedLogo = event.target.result;
+                updateQRCode();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    const tabs = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.style.display = 'none');
+            
+            tab.classList.add('active');
+            activeTab = tab.dataset.tab;
+            const targetContent = document.getElementById(`tab-${activeTab}`);
+            if (targetContent) targetContent.style.display = 'block';
+            updateQRCode();
+        });
+    });
 
     // Initial check
     updateQRCode();
