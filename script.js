@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const sizeLabel = document.getElementById('size-label');
     const qrcodeContainer = document.getElementById('qrcode');
     const placeholderOverlay = document.getElementById('placeholder-overlay');
+    const centerTextInput = document.getElementById('center-text-input');
+    const centerTextFont = document.getElementById('center-text-font');
+    const centerTextColor = document.getElementById('center-text-color');
+    const centerTextColorVal = document.getElementById('center-text-color-val');
     const downloadBtn = document.getElementById('download-btn');
     const qrWrapper = document.getElementById('qr-wrapper');
     
@@ -302,6 +306,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (document.getElementById('dot-style')) document.getElementById('dot-style').disabled = false;
                 if (document.getElementById('corner-style')) document.getElementById('corner-style').disabled = false;
                 if (document.getElementById('logo-input')) document.getElementById('logo-input').disabled = false;
+                if (centerTextInput) centerTextInput.disabled = false;
+                if (centerTextFont) centerTextFont.disabled = false;
+                if (centerTextColor) centerTextColor.disabled = false;
                 premiumBadges.forEach(badge => badge.style.display = 'none');
             } else {
                 // Basic logged in user, PRO still locked
@@ -311,6 +318,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (document.getElementById('dot-style')) document.getElementById('dot-style').disabled = true;
                 if (document.getElementById('corner-style')) document.getElementById('corner-style').disabled = true;
                 if (document.getElementById('logo-input')) document.getElementById('logo-input').disabled = true;
+                if (centerTextInput) centerTextInput.disabled = true;
+                if (centerTextFont) centerTextFont.disabled = true;
+                if (centerTextColor) centerTextColor.disabled = true;
                 premiumBadges.forEach(badge => badge.style.display = 'inline-block');
             }
         } else {
@@ -325,6 +335,9 @@ document.addEventListener('DOMContentLoaded', () => {
             lockedFeatures.forEach(el => el.classList.add('feature-locked'));
             colorDarkInput.disabled = true;
             colorLightInput.disabled = true;
+            if (centerTextInput) centerTextInput.disabled = true;
+            if (centerTextFont) centerTextFont.disabled = true;
+            if (centerTextColor) centerTextColor.disabled = true;
             premiumBadges.forEach(badge => badge.style.display = 'inline-block');
         }
 
@@ -679,7 +692,15 @@ document.addEventListener('DOMContentLoaded', () => {
             saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-save"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Saved!';
             
             if (isDynamic) {
-                const trackingUrl = `${window.location.origin}/redirect.html?id=${data[0].id}`;
+                let currentUrl = new URL(window.location.href);
+                let pathname = currentUrl.pathname;
+                if (pathname.endsWith('index.html')) {
+                    pathname = pathname.substring(0, pathname.length - 'index.html'.length);
+                }
+                if (!pathname.endsWith('/')) {
+                    pathname += '/';
+                }
+                const trackingUrl = `${currentUrl.origin}${pathname}redirect.html?id=${data[0].id}`;
                 qrcode.update({ data: trackingUrl });
             }
 
@@ -799,7 +820,37 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        if (loadedLogo) {
+        if (centerTextInput && centerTextInput.value.trim() !== '') {
+            const textContent = centerTextInput.value.trim();
+            const textFont = centerTextFont ? centerTextFont.value : 'Arial';
+            const textColor = centerTextColor ? centerTextColor.value : '#000000';
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 300;
+            canvas.height = 300;
+            
+            let fontSize = 80;
+            ctx.font = `bold ${fontSize}px "${textFont}"`;
+            let textMetrics = ctx.measureText(textContent);
+            
+            while(textMetrics.width > 280 && fontSize > 10) {
+                fontSize -= 2;
+                ctx.font = `bold ${fontSize}px "${textFont}"`;
+                textMetrics = ctx.measureText(textContent);
+            }
+            
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = textColor;
+            ctx.fillText(textContent, canvas.width / 2, canvas.height / 2);
+            
+            qrOptions.image = canvas.toDataURL('image/png');
+            qrOptions.imageOptions = {
+                crossOrigin: "anonymous",
+                margin: 5
+            };
+        } else if (loadedLogo) {
             qrOptions.image = loadedLogo;
             qrOptions.imageOptions = {
                 crossOrigin: "anonymous",
@@ -838,6 +889,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     colorDarkInput.addEventListener('input', updateQRCode);
     colorLightInput.addEventListener('input', updateQRCode);
+    
+    if (centerTextInput) centerTextInput.addEventListener('input', updateQRCode);
+    if (centerTextFont) centerTextFont.addEventListener('change', updateQRCode);
+    if (centerTextColor) {
+        centerTextColor.addEventListener('input', (e) => {
+            centerTextColorVal.textContent = e.target.value;
+            updateQRCode();
+        });
+    }
 
     // All dynamic data inputs
     document.querySelectorAll('.qr-data-input').forEach(input => {

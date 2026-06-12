@@ -181,7 +181,7 @@
                     </div>
 
                     <div class="input-group feature-locked lock-style" id="lock-logo" style="margin-top: 1rem;">
-                        <label>Center Logo <span class="premium-badge">PRO</span></label>
+                        <label>Center Logo Image <span class="premium-badge">PRO</span></label>
                         <div class="file-upload-wrapper" style="position: relative; width: 100%; margin-top: 0.5rem;">
                             <label for="logo-input" class="secondary-btn"
                                 style="display: flex; justify-content: center; width: 100%; cursor: pointer; border: 1px dashed rgba(255,255,255,0.2); background: rgba(255,255,255,0.03); transition: all 0.3s ease;">
@@ -200,7 +200,25 @@
                         </div>
                         <p
                             style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; text-align: center;">
-                            Max 1MB. Transparent PNG works best.</p>
+                            Or add custom text instead:</p>
+
+                        <div style="margin-top: 0.5rem;">
+                            <input type="text" id="center-text-input" placeholder="e.g. SCAN ME" disabled
+                                style="width: 100%; margin-bottom: 0.5rem;">
+                            <div class="customization-grid">
+                                <select id="center-text-font" class="qr-style-select" disabled>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Impact">Impact</option>
+                                    <option value="Courier New">Courier New</option>
+                                    <option value="Georgia">Georgia</option>
+                                    <option value="Verdana">Verdana</option>
+                                </select>
+                                <div class="color-picker-wrapper" style="margin-top: 0;">
+                                    <input type="color" id="center-text-color" value="#000000" disabled>
+                                    <span class="color-value" id="center-text-color-val">#000000</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="input-group">
@@ -316,9 +334,8 @@
                                     stroke-linejoin="round">
                                     <polyline points="20 6 9 17 4 12"></polyline>
                                 </svg> Basic Analytics</li>
-                        </ul>
-                        <button class="primary-btn premium-btn subscribe-btn"
-                            data-link="https://buy.stripe.com/8x27sEaqrbDd7c1f17bMQ00">Get Starter</button>
+                            <button class="primary-btn premium-btn subscribe-btn" style="width:100%"
+                                data-link="https://buy.stripe.com/aFa6oA1TV22D2VL5qxbMQ01">Get Starter</button>
                     </div>
 
                     <!-- Professional Plan -->
@@ -345,8 +362,8 @@
                                     <polyline points="20 6 9 17 4 12"></polyline>
                                 </svg> Priority Support</li>
                         </ul>
-                        <button class="primary-btn premium-btn subscribe-btn"
-                            data-link="https://buy.stripe.com/aFa6oA1TV22D2VL5qxbMQ01">Get Professional</button>
+                        <button class="primary-btn premium-btn subscribe-btn" style="width:100%"
+                            data-link="https://buy.stripe.com/8x27sEaqrbDd7c1f17bMQ00">Get Professional</button>
                     </div>
                 </div>
             </div>
