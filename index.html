@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <nav class="top-nav">
         <div class="nav-content">
@@ -26,7 +28,11 @@
                 <button id="user-menu-btn" class="nav-btn">Login</button>
                 <div id="user-dropdown" class="user-dropdown hidden panel-glass">
                     <a href="#" id="drop-login">Login / Sign Up</a>
+                    <a href="#" id="drop-saved" style="display: none;">My Saved Codes</a>
                     <a href="#" id="drop-settings" style="display: none;">Account Settings</a>
+                    <a href="#" id="drop-admin" style="display: none; color: #8b5cf6; font-weight: 600;">Owner Dashboard
+                        <span class="premium-badge inline-badge" style="background:#8b5cf6;">ADMIN</span></a>
+                    <div class="dropdown-divider"></div>
                     <a href="#" id="drop-logout" style="display: none;">Logout</a>
                 </div>
             </div>
@@ -54,15 +60,21 @@
                     <div class="tab-content active" id="tab-text">
                         <div class="input-group">
                             <label for="qr-data">Enter URL or Text</label>
-                            <textarea id="qr-data" class="qr-data-input" placeholder="e.g. https://google.com" rows="3"></textarea>
+                            <textarea id="qr-data" class="qr-data-input" placeholder="e.g. https://google.com"
+                                rows="3"></textarea>
                         </div>
-                        <div class="input-group" style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; background: rgba(15,23,42,0.4); padding: 0.75rem; border-radius: 8px;">
-                            <input type="checkbox" id="is-dynamic" style="width: 1.2rem; height: 1.2rem; cursor: pointer;">
+                        <div class="input-group"
+                            style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; background: rgba(15,23,42,0.4); padding: 0.75rem; border-radius: 8px;">
+                            <input type="checkbox" id="is-dynamic"
+                                style="width: 1.2rem; height: 1.2rem; cursor: pointer;">
                             <div style="display: flex; flex-direction: column;">
-                                <label for="is-dynamic" style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                                <label for="is-dynamic"
+                                    style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
                                     Make Dynamic (Track Scans) <span class="premium-badge inline-badge">PRO</span>
                                 </label>
-                                <span style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">Requires URL input. Scans route through our server for analytics.</span>
+                                <span
+                                    style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">Requires
+                                    URL input. Scans route through our server for analytics.</span>
                             </div>
                         </div>
                     </div>
@@ -78,7 +90,8 @@
                         </div>
                         <div class="input-group">
                             <label>Encryption</label>
-                            <select id="wifi-enc" class="qr-data-input" style="background: rgba(15,23,42,0.4); color: white; border: 1px solid var(--panel-border); padding: 0.8rem; border-radius: 8px; width: 100%;">
+                            <select id="wifi-enc" class="qr-data-input"
+                                style="background: rgba(15,23,42,0.4); color: white; border: 1px solid var(--panel-border); padding: 0.8rem; border-radius: 8px; width: 100%;">
                                 <option value="WPA">WPA/WPA2</option>
                                 <option value="WEP">WEP</option>
                                 <option value="nopass">None</option>
@@ -97,7 +110,8 @@
                         </div>
                         <div class="input-group">
                             <label>Message</label>
-                            <textarea id="email-msg" class="qr-data-input" rows="2" placeholder="Hi there..."></textarea>
+                            <textarea id="email-msg" class="qr-data-input" rows="2"
+                                placeholder="Hi there..."></textarea>
                         </div>
                     </div>
 
@@ -134,7 +148,7 @@
                                 <span class="color-value" id="color-dark-val">#0f172a</span>
                             </div>
                         </div>
-                        
+
                         <div class="input-group feature-locked lock-style" id="lock-bg">
                             <label for="color-light">Background <span class="premium-badge">PRO</span></label>
                             <div class="color-picker-wrapper">
@@ -155,7 +169,7 @@
                                 <option value="classy-rounded">Classy Rounded</option>
                             </select>
                         </div>
-                        
+
                         <div class="input-group feature-locked lock-style" id="lock-corner">
                             <label>Corner Style <span class="premium-badge">PRO</span></label>
                             <select id="corner-style" class="qr-style-select" disabled>
@@ -168,8 +182,25 @@
 
                     <div class="input-group feature-locked lock-style" id="lock-logo" style="margin-top: 1rem;">
                         <label>Center Logo <span class="premium-badge">PRO</span></label>
-                        <input type="file" id="logo-input" accept="image/png, image/jpeg" style="background: rgba(15,23,42,0.4); padding: 0.5rem; border-radius: 8px; font-size: 0.9rem; color: white;" disabled>
-                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">Max 1MB. Transparent PNG works best.</p>
+                        <div class="file-upload-wrapper" style="position: relative; width: 100%; margin-top: 0.5rem;">
+                            <label for="logo-input" class="secondary-btn"
+                                style="display: flex; justify-content: center; width: 100%; cursor: pointer; border: 1px dashed rgba(255,255,255,0.2); background: rgba(255,255,255,0.03); transition: all 0.3s ease;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" style="margin-right: 8px;">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" x2="12" y1="3" y2="15" />
+                                </svg>
+                                Upload Image
+                            </label>
+                            <input type="file" id="logo-input" accept="image/png, image/jpeg"
+                                style="position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;"
+                                disabled>
+                        </div>
+                        <p
+                            style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; text-align: center;">
+                            Max 1MB. Transparent PNG works best.</p>
                     </div>
 
                     <div class="input-group">
@@ -183,14 +214,46 @@
                         <!-- QR Code will be injected here -->
                         <div id="qrcode"></div>
                         <div class="placeholder-overlay" id="placeholder-overlay">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-qr-code"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-qr-code">
+                                <rect width="5" height="5" x="3" y="3" rx="1" />
+                                <rect width="5" height="5" x="16" y="3" rx="1" />
+                                <rect width="5" height="5" x="3" y="16" rx="1" />
+                                <path d="M21 16h-3a2 2 0 0 0-2 2v3" />
+                                <path d="M21 21v.01" />
+                                <path d="M12 7v3a2 2 0 0 1-2 2H7" />
+                                <path d="M3 12h.01" />
+                                <path d="M12 3h.01" />
+                                <path d="M12 16v.01" />
+                                <path d="M16 12h1" />
+                                <path d="M21 12v.01" />
+                                <path d="M12 21v-1" />
+                            </svg>
                             <p>Awaiting Input...</p>
                         </div>
                     </div>
-                    
+
                     <button id="download-btn" class="primary-btn feature-locked" disabled>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-download">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" x2="12" y1="15" y2="3" />
+                        </svg>
                         Download <span class="premium-badge inline-badge">PRO</span>
+                    </button>
+                    <button id="save-btn" class="primary-btn"
+                        style="margin-top: 0.75rem; width: 100%; display: none; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-save">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                            <polyline points="17 21 17 13 7 13 7 21" />
+                            <polyline points="7 3 7 8 15 8" />
+                        </svg>
+                        Save to Dashboard
                     </button>
                 </div>
             </section>
@@ -205,17 +268,20 @@
                     <div class="feature-card panel-glass">
                         <div class="feature-icon">🚀</div>
                         <h3>Instant Access</h3>
-                        <p>Direct customers instantly to your website, menus, or promotional offers without typing URLs.</p>
+                        <p>Direct customers instantly to your website, menus, or promotional offers without typing URLs.
+                        </p>
                     </div>
                     <div class="feature-card panel-glass">
                         <div class="feature-icon">📊</div>
                         <h3>Trackable Analytics</h3>
-                        <p>Measure scan locations, times, and devices to optimize your marketing campaigns in real time.</p>
+                        <p>Measure scan locations, times, and devices to optimize your marketing campaigns in real time.
+                        </p>
                     </div>
                     <div class="feature-card panel-glass">
                         <div class="feature-icon">🎨</div>
                         <h3>Brand Identity</h3>
-                        <p>Customize your codes with your brand colors and logos to ensure trust and higher scan rates.</p>
+                        <p>Customize your codes with your brand colors and logos to ensure trust and higher scan rates.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -226,7 +292,7 @@
             <div class="section-container">
                 <h2 class="section-title">Transparent Pricing</h2>
                 <p class="section-subtitle">No hidden fees. Month-to-month billing. Cancel anytime.</p>
-                
+
                 <div class="pricing-cards-container page-pricing">
                     <!-- Starter Plan -->
                     <div class="pricing-card panel-glass">
@@ -235,11 +301,24 @@
                             <span class="currency">$</span><span class="amount">7</span><span class="period">/mo</span>
                         </div>
                         <ul class="features-list">
-                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Custom Colors</li>
-                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> 5 Dynamic Codes</li>
-                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Basic Analytics</li>
+                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg> Custom Colors</li>
+                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg> 5 Dynamic Codes</li>
+                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg> Basic Analytics</li>
                         </ul>
-                        <button class="primary-btn premium-btn subscribe-btn">Get Starter</button>
+                        <button class="primary-btn premium-btn subscribe-btn"
+                            data-link="https://buy.stripe.com/8x27sEaqrbDd7c1f17bMQ00">Get Starter</button>
                     </div>
 
                     <!-- Professional Plan -->
@@ -250,11 +329,24 @@
                             <span class="currency">$</span><span class="amount">19</span><span class="period">/mo</span>
                         </div>
                         <ul class="features-list">
-                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> High-Res PNG/SVG</li>
-                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited Codes</li>
-                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Priority Support</li>
+                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg> High-Res PNG/SVG</li>
+                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg> Unlimited Codes</li>
+                            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg> Priority Support</li>
                         </ul>
-                        <button class="primary-btn premium-btn subscribe-btn">Get Professional</button>
+                        <button class="primary-btn premium-btn subscribe-btn"
+                            data-link="https://buy.stripe.com/aFa6oA1TV22D2VL5qxbMQ01">Get Professional</button>
                     </div>
                 </div>
             </div>
@@ -265,40 +357,91 @@
             <div class="section-container">
                 <h2 class="section-title">How We Compare</h2>
                 <p class="section-subtitle">Get the premium features you need at a fraction of the cost.</p>
-                
+
                 <div class="table-container panel-glass">
                     <table class="compare-table">
                         <thead>
                             <tr>
                                 <th>Feature</th>
-                                <th>QR Gen Pro</th>
-                                <th>Bitly / Others</th>
+                                <th>Free</th>
+                                <th>Starter</th>
+                                <th>Professional</th>
+                                <th>Others</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>Starting Price</td>
-                                <td class="highlight-cell">$7 / month</td>
-                                <td>$15 - $35 / month</td>
+                                <td class="highlight-cell"
+                                    style="background: rgba(100, 116, 139, 0.1); color: var(--text-primary);">$0</td>
+                                <td class="highlight-cell"
+                                    style="background: rgba(139, 92, 246, 0.1); color: var(--accent-primary);">$7 / mo
+                                </td>
+                                <td class="highlight-cell" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                                    $19 / mo</td>
+                                <td>$15 - $35+ / mo</td>
                             </tr>
                             <tr>
-                                <td>Pro Features</td>
-                                <td class="highlight-cell">$19 / month</td>
-                                <td>$40 - $100+ / month</td>
+                                <td>Saved QR Codes</td>
+                                <td class="highlight-cell"
+                                    style="background: rgba(100, 116, 139, 0.1); color: var(--text-primary);">1 Code
+                                </td>
+                                <td class="highlight-cell"
+                                    style="background: rgba(139, 92, 246, 0.1); color: var(--accent-primary);">Unlimited
+                                </td>
+                                <td class="highlight-cell" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                                    Unlimited</td>
+                                <td>Limited</td>
                             </tr>
                             <tr>
                                 <td>Dynamic Codes</td>
-                                <td class="highlight-cell">Included</td>
+                                <td class="highlight-cell"
+                                    style="background: rgba(100, 116, 139, 0.1); color: var(--text-primary);">Basic</td>
+                                <td class="highlight-cell"
+                                    style="background: rgba(139, 92, 246, 0.1); color: var(--accent-primary);">Unlimited
+                                </td>
+                                <td class="highlight-cell" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                                    Unlimited</td>
                                 <td>Often Restricted</td>
                             </tr>
                             <tr>
-                                <td>High-Res Exports</td>
-                                <td class="highlight-cell">Included</td>
+                                <td>Custom Logo Upload</td>
+                                <td class="highlight-cell"
+                                    style="background: rgba(100, 116, 139, 0.1); color: #ef4444;">No</td>
+                                <td class="highlight-cell"
+                                    style="background: rgba(139, 92, 246, 0.1); color: var(--accent-primary);">Yes</td>
+                                <td class="highlight-cell" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                                    Yes</td>
                                 <td>Premium Only</td>
                             </tr>
                             <tr>
-                                <td>Custom Colors</td>
-                                <td class="highlight-cell">Included</td>
+                                <td>Custom Shapes & Colors</td>
+                                <td class="highlight-cell"
+                                    style="background: rgba(100, 116, 139, 0.1); color: #ef4444;">No</td>
+                                <td class="highlight-cell"
+                                    style="background: rgba(139, 92, 246, 0.1); color: var(--accent-primary);">Yes</td>
+                                <td class="highlight-cell" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                                    Yes</td>
+                                <td>Premium Only</td>
+                            </tr>
+                            <tr>
+                                <td>High-Res Exports</td>
+                                <td class="highlight-cell"
+                                    style="background: rgba(100, 116, 139, 0.1); color: #ef4444;">No</td>
+                                <td class="highlight-cell"
+                                    style="background: rgba(139, 92, 246, 0.1); color: var(--accent-primary);">Yes</td>
+                                <td class="highlight-cell" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                                    Yes</td>
+                                <td>Premium Only</td>
+                            </tr>
+                            <tr>
+                                <td>Priority Support</td>
+                                <td class="highlight-cell"
+                                    style="background: rgba(100, 116, 139, 0.1); color: #ef4444;">No</td>
+                                <td class="highlight-cell" style="background: rgba(139, 92, 246, 0.1); color: #ef4444;">
+                                    No</td>
+                                <td class="highlight-cell" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                                    Yes</td>
                                 <td>Premium Only</td>
                             </tr>
                         </tbody>
@@ -346,7 +489,8 @@
                     Sign In
                 </button>
             </form>
-            <p class="modal-footer"><span id="auth-switch-text">Don't have an account?</span> <a href="#" id="auth-switch-link">Sign Up</a></p>
+            <p class="modal-footer"><span id="auth-switch-text">Don't have an account?</span> <a href="#"
+                    id="auth-switch-link">Sign Up</a></p>
         </div>
     </div>
 
@@ -358,7 +502,7 @@
                 <h2>Choose Your Plan</h2>
                 <p>Unlock custom colors and high-res downloads.</p>
             </div>
-            
+
             <div class="pricing-cards-container">
                 <!-- Starter Plan -->
                 <div class="pricing-card">
@@ -367,11 +511,24 @@
                         <span class="currency">$</span><span class="amount">7</span><span class="period">/mo</span>
                     </div>
                     <ul class="features-list">
-                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Custom Colors</li>
-                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> 5 Dynamic Codes</li>
-                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Basic Analytics</li>
+                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Custom Colors</li>
+                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> 5 Dynamic Codes</li>
+                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Basic Analytics</li>
                     </ul>
-                    <button class="primary-btn premium-btn subscribe-btn">
+                    <button class="primary-btn premium-btn subscribe-btn"
+                        data-link="https://buy.stripe.com/8x27sEaqrbDd7c1f17bMQ00">
                         Get Starter
                     </button>
                 </div>
@@ -384,11 +541,24 @@
                         <span class="currency">$</span><span class="amount">19</span><span class="period">/mo</span>
                     </div>
                     <ul class="features-list">
-                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> High-Res PNG/SVG</li>
-                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Unlimited Codes</li>
-                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Priority Support</li>
+                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> High-Res PNG/SVG</li>
+                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Unlimited Codes</li>
+                        <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="var(--gold-accent)" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Priority Support</li>
                     </ul>
-                    <button class="primary-btn premium-btn subscribe-btn">
+                    <button class="primary-btn premium-btn subscribe-btn"
+                        data-link="https://buy.stripe.com/aFa6oA1TV22D2VL5qxbMQ01">
                         Get Professional
                     </button>
                 </div>
@@ -405,11 +575,13 @@
                 <h2>Account Settings</h2>
                 <p>Manage your profile and subscription.</p>
             </div>
-            
+
             <div class="settings-section">
                 <h3>Subscription</h3>
-                <p style="margin-bottom: 1rem; color: var(--text-secondary);">Current Plan: <strong id="current-plan-text" style="color: var(--text-primary);">Starter</strong></p>
-                <button id="manage-sub-btn" class="primary-btn premium-btn" style="width: auto; padding: 0.5rem 1.5rem; font-size: 0.95rem;">Manage Subscription</button>
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);">Current Plan: <strong
+                        id="current-plan-text" style="color: var(--text-primary);">Starter</strong></p>
+                <button id="manage-sub-btn" class="primary-btn premium-btn"
+                    style="width: auto; padding: 0.5rem 1.5rem; font-size: 0.95rem;">Manage Subscription</button>
             </div>
 
             <div class="settings-section">
@@ -422,7 +594,8 @@
                     <label for="settings-phone">Phone Number</label>
                     <input type="tel" id="settings-phone">
                 </div>
-                <button id="update-profile-btn" class="primary-btn" style="width: auto; padding: 0.5rem 1.5rem; font-size: 0.95rem;">Update Profile</button>
+                <button id="update-profile-btn" class="primary-btn"
+                    style="width: auto; padding: 0.5rem 1.5rem; font-size: 0.95rem;">Update Profile</button>
             </div>
 
             <div class="settings-section">
@@ -431,10 +604,13 @@
                     <label for="settings-password">New Password</label>
                     <input type="password" id="settings-password" placeholder="••••••••">
                 </div>
-                <button id="update-password-btn" class="primary-btn" style="width: auto; padding: 0.5rem 1.5rem; font-size: 0.95rem;">Update Password</button>
+                <button id="update-password-btn" class="primary-btn"
+                    style="width: auto; padding: 0.5rem 1.5rem; font-size: 0.95rem;">Update Password</button>
             </div>
-            
-            <div id="settings-msg" style="margin-top: 1.5rem; text-align: center; display: none; font-weight: 500; padding: 0.5rem; border-radius: 8px;"></div>
+
+            <div id="settings-msg"
+                style="margin-top: 1.5rem; text-align: center; display: none; font-weight: 500; padding: 0.5rem; border-radius: 8px;">
+            </div>
         </div>
     </div>
     <!-- Saved Codes Modal -->
@@ -451,9 +627,144 @@
         </div>
     </div>
 
+    <!-- Support & FAQ Section -->
+    <section id="support" class="info-section">
+        <div class="section-container">
+            <h2 class="section-title">Support & FAQ</h2>
+            <p class="section-subtitle">Got questions? We've got answers.</p>
 
+            <div class="faq-container"
+                style="max-width: 800px; margin: 2rem auto; display: flex; flex-direction: column; gap: 1rem;">
+                <div class="faq-item panel-glass" style="padding: 1.5rem; text-align: left;">
+                    <button class="faq-btn"
+                        style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; color: var(--text-primary); font-size: 1.1rem; font-weight: 600; cursor: pointer; padding: 0;">
+                        What is a Dynamic QR Code? <span class="faq-icon"
+                            style="color: var(--gold-accent); font-size: 1.5rem;">+</span>
+                    </button>
+                    <div class="faq-content"
+                        style="display: none; margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">
+                        <p>A dynamic QR code allows you to change the destination URL even after it has been printed. It
+                            also allows us to track scan statistics for you!</p>
+                    </div>
+                </div>
+                <div class="faq-item panel-glass" style="padding: 1.5rem; text-align: left;">
+                    <button class="faq-btn"
+                        style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; color: var(--text-primary); font-size: 1.1rem; font-weight: 600; cursor: pointer; padding: 0;">
+                        How do I access Pro features? <span class="faq-icon"
+                            style="color: var(--gold-accent); font-size: 1.5rem;">+</span>
+                    </button>
+                    <div class="faq-content"
+                        style="display: none; margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">
+                        <p>Simply upgrade your account to the Starter or Professional tier, and features like custom
+                            shapes, logos, and high-res downloads will unlock automatically.</p>
+                    </div>
+                </div>
+                <div class="faq-item panel-glass" style="padding: 1.5rem; text-align: left;">
+                    <button class="faq-btn"
+                        style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; color: var(--text-primary); font-size: 1.1rem; font-weight: 600; cursor: pointer; padding: 0;">
+                        Can I cancel my subscription? <span class="faq-icon"
+                            style="color: var(--gold-accent); font-size: 1.5rem;">+</span>
+                    </button>
+                    <div class="faq-content"
+                        style="display: none; margin-top: 1rem; color: var(--text-secondary); line-height: 1.6;">
+                        <p>Yes, all billing is month-to-month. You can cancel at any time from your Account Settings.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Terms of Service Modal -->
+            <div class="support-contact" style="text-align: center; margin-top: 3rem;">
+                <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Still need help?</h3>
+                <button id="open-support-btn" class="primary-btn"
+                    style="display: inline-flex; align-items: center; justify-content: center; width: auto; padding: 0.75rem 2rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-mail" style="margin-right: 0.5rem;">
+                        <rect width="20" height="16" x="2" y="4" rx="2" />
+                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                    </svg>
+                    Open Support Ticket
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Support Ticket Modal -->
+    <div class="modal-overlay" id="support-modal">
+        <div class="modal-content panel-glass" style="max-width: 500px;">
+            <button class="close-modal" id="close-support-modal">&times;</button>
+            <div class="modal-header">
+                <h2>Submit a Ticket</h2>
+                <p>We'll get back to you as soon as possible.</p>
+            </div>
+            <form id="support-form" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+                <div class="input-group">
+                    <label for="ticket-subject">Subject</label>
+                    <input type="text" id="ticket-subject" placeholder="What do you need help with?" required>
+                </div>
+                <div class="input-group">
+                    <label for="ticket-message">Message</label>
+                    <textarea id="ticket-message" rows="4" placeholder="Describe your issue..." required></textarea>
+                </div>
+                <div id="support-msg" style="text-align: center; font-size: 0.9rem; margin-bottom: 0.5rem;"></div>
+                <button type="submit" class="primary-btn" id="submit-ticket-btn">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard Modal -->
+    <div class="modal-overlay" id="admin-modal">
+        <div class="modal-content panel-glass"
+            style="max-width: 900px; width: 95%; max-height: 90vh; display: flex; flex-direction: column;">
+            <button class="close-modal" id="close-admin-modal">&times;</button>
+            <div class="modal-header">
+                <h2>Owner Dashboard</h2>
+                <p>Manage users and support tickets.</p>
+            </div>
+
+            <div class="tabs-container" style="margin-top: 1rem;">
+                <button class="tab-btn admin-tab-btn active" data-tab="admin-users">Users</button>
+                <button class="tab-btn admin-tab-btn" data-tab="admin-tickets">Support Tickets</button>
+            </div>
+
+            <!-- Users Tab -->
+            <div class="admin-tab-content active" id="tab-admin-users"
+                style="flex: 1; overflow-y: auto; margin-top: 1rem;">
+                <table class="compare-table" style="width: 100%; text-align: left; min-width: 600px;">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Joined</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-users-list">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tickets Tab -->
+            <div class="admin-tab-content" id="tab-admin-tickets"
+                style="display: none; flex: 1; overflow-y: auto; margin-top: 1rem;">
+                <table class="compare-table" style="width: 100%; text-align: left; min-width: 700px;">
+                    <thead>
+                        <tr>
+                            <th>User Email</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-tickets-list">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
     <div class="modal-overlay" id="tos-modal">
         <div class="modal-content panel-glass" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
             <button class="close-modal" id="close-tos-modal">&times;</button>
@@ -465,16 +776,20 @@
                 <p>By using our dynamic QR code generator, you agree to these terms.</p>
                 <br>
                 <h3>1. Subscription and Billing</h3>
-                <p>You will be billed monthly for your chosen tier. You may cancel at any time through your account settings. Payments are securely processed via our payment partners.</p>
+                <p>You will be billed monthly for your chosen tier. You may cancel at any time through your account
+                    settings. Payments are securely processed via our payment partners.</p>
                 <br>
                 <h3>2. Service Availability</h3>
-                <p>We strive for 99.9% uptime, but we do not guarantee the service will be entirely free of interruptions or bugs. Maintenance windows will be announced in advance.</p>
+                <p>We strive for 99.9% uptime, but we do not guarantee the service will be entirely free of
+                    interruptions or bugs. Maintenance windows will be announced in advance.</p>
                 <br>
                 <h3>3. Prohibited Content</h3>
-                <p>You may not use our QR codes to link to malicious, illegal, or harmful content. Accounts found violating this policy will be terminated immediately without refund.</p>
+                <p>You may not use our QR codes to link to malicious, illegal, or harmful content. Accounts found
+                    violating this policy will be terminated immediately without refund.</p>
                 <br>
                 <h3>4. Data Privacy</h3>
-                <p>We respect your privacy. All saved QR configurations are securely tied to your user account and are not shared with third parties.</p>
+                <p>We respect your privacy. All saved QR configurations are securely tied to your user account and are
+                    not shared with third parties.</p>
             </div>
         </div>
     </div>
@@ -486,4 +801,5 @@
     <!-- Custom JS -->
     <script src="script.js"></script>
 </body>
+
 </html>
