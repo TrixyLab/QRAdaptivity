@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const userDropdown = document.getElementById('user-dropdown');
     const dropLogin = document.getElementById('drop-login');
     const dropSettings = document.getElementById('drop-settings');
+    const dropAdmin = document.getElementById('drop-admin');
     const dropLogout = document.getElementById('drop-logout');
     
     // Settings Elements
@@ -60,11 +61,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const lockedFeatures = document.querySelectorAll('.feature-locked');
     const premiumBadges = document.querySelectorAll('.premium-badge');
 
+    // Admin & Support Elements
+    const adminModal = document.getElementById('admin-modal');
+    const closeAdminModalBtn = document.getElementById('close-admin-modal');
+    const adminUsersList = document.getElementById('admin-users-list');
+    const adminTicketsList = document.getElementById('admin-tickets-list');
+    
+    const supportModal = document.getElementById('support-modal');
+    const openSupportBtn = document.getElementById('open-support-btn');
+    const closeSupportModalBtn = document.getElementById('close-support-modal');
+    const supportForm = document.getElementById('support-form');
+    const ticketSubject = document.getElementById('ticket-subject');
+    const ticketMessage = document.getElementById('ticket-message');
+    const supportMsg = document.getElementById('support-msg');
+
     let qrcode = null;
     let isLoggedIn = false;
     let currentUser = null;
-    let isPro = localStorage.getItem('is_pro') === 'true';
+    let isPro = false;
+    let isAdmin = false;
     let authMode = 'login'; // 'login' or 'signup'
+    
+    // Restore mock session if testing locally
+    const mockSession = localStorage.getItem('mock_session');
+    if (mockSession) {
+        try {
+            currentUser = JSON.parse(mockSession);
+            isLoggedIn = true;
+            if (currentUser.is_admin) {
+                isAdmin = true;
+                isPro = true;
+            }
+        } catch(e) {}
+    }
 
     // --- Authentication Logic ---
 
@@ -161,6 +190,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.warn("Supabase rate limit hit. Mocking successful login to unblock UI testing.");
                     authError.style.display = 'none';
                     isLoggedIn = true;
+                    currentUser = { id: 'mock-user-123', email: email };
+                    localStorage.setItem('mock_session', JSON.stringify(currentUser));
                     closeLoginModal();
                     updateUIForAuth();
                     
@@ -171,6 +202,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw error;
             }
             
+            // On successful login/signup with valid session:
+            localStorage.removeItem('mock_session');
+            const userRes = await supabase.auth.getUser();
+            if (userRes.data && userRes.data.user) {
+                currentUser = userRes.data.user;
+            }
+            isLoggedIn = true;
+            closeLoginModal();
+            updateUIForAuth();
+
             submitLoginBtn.textContent = authMode === 'signup' ? 'Sign Up' : 'Sign In';
             submitLoginBtn.disabled = false;
         } catch (error) {
@@ -191,31 +232,85 @@ document.addEventListener('DOMContentLoaded', () => {
             closeLoginModal();
             updateUIForAuth();
         } else {
+            const mockSession = localStorage.getItem('mock_session');
+            if (mockSession) {
+                try {
+                    currentUser = JSON.parse(mockSession);
+                    isLoggedIn = true;
+                    updateUIForAuth();
+                    return;
+                } catch(e) {}
+            }
             isLoggedIn = false;
             currentUser = null;
             updateUIForAuth();
         }
     });
 
-    const updateUIForAuth = () => {
+    async function updateUIForAuth() {
         if (isLoggedIn) {
+            // Fetch profile data if we have a real user (might be null if rate-limit mocked)
+            if (currentUser && currentUser.id !== 'hardcoded-admin' && currentUser.id !== 'mock-user-123') {
+                try {
+                    const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+                    
+                    if (profile) {
+                        isPro = profile.is_pro;
+                        isAdmin = profile.is_admin;
+                        
+                        // Hardcoded permanent Admin and Professional level
+                        if (currentUser.email && currentUser.email.toLowerCase() === 'admin@admin.com') {
+                            isAdmin = true;
+                            isPro = true;
+                        }
+
+                        // Admins automatically get the highest plan
+                        if (isAdmin) {
+                            isPro = true;
+                        }
+                    } else if (error && error.code === 'PGRST116') {
+                        // Profile does not exist yet. Create it!
+                        const defaultIsAdmin = (currentUser.email && currentUser.email.toLowerCase() === 'admin@admin.com');
+                        await supabase.from('profiles').insert([
+                            { id: currentUser.id, email: currentUser.email, is_pro: defaultIsAdmin, is_admin: defaultIsAdmin }
+                        ]);
+                        
+                        if (defaultIsAdmin) {
+                            isAdmin = true;
+                            isPro = true;
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Could not fetch or create profile:", e);
+                }
+            }
+
             userMenuBtn.textContent = 'Account ▾';
             dropLogin.style.display = 'none';
             dropSaved.style.display = 'block';
             dropSettings.style.display = 'block';
+            dropAdmin.style.display = isAdmin ? 'block' : 'none';
             dropLogout.style.display = 'block';
+            
+            if (saveBtn) saveBtn.style.display = 'block';
             
             if (isPro) {
                 // Unlock features for Pro Users
                 lockedFeatures.forEach(el => el.classList.remove('feature-locked'));
                 colorDarkInput.disabled = false;
                 colorLightInput.disabled = false;
+                if (document.getElementById('dot-style')) document.getElementById('dot-style').disabled = false;
+                if (document.getElementById('corner-style')) document.getElementById('corner-style').disabled = false;
+                if (document.getElementById('logo-input')) document.getElementById('logo-input').disabled = false;
                 premiumBadges.forEach(badge => badge.style.display = 'none');
             } else {
                 // Basic logged in user, PRO still locked
                 lockedFeatures.forEach(el => el.classList.add('feature-locked'));
                 colorDarkInput.disabled = true;
                 colorLightInput.disabled = true;
+                if (document.getElementById('dot-style')) document.getElementById('dot-style').disabled = true;
+                if (document.getElementById('corner-style')) document.getElementById('corner-style').disabled = true;
+                if (document.getElementById('logo-input')) document.getElementById('logo-input').disabled = true;
                 premiumBadges.forEach(badge => badge.style.display = 'inline-block');
             }
         } else {
@@ -223,7 +318,9 @@ document.addEventListener('DOMContentLoaded', () => {
             dropLogin.style.display = 'block';
             dropSaved.style.display = 'none';
             dropSettings.style.display = 'none';
+            dropAdmin.style.display = 'none';
             dropLogout.style.display = 'none';
+            if (saveBtn) saveBtn.style.display = 'none';
             
             lockedFeatures.forEach(el => el.classList.add('feature-locked'));
             colorDarkInput.disabled = true;
@@ -232,7 +329,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Re-evaluate download button state based on content
-        if (dataInput.value.trim() !== '') {
+        const currentData = typeof getFormattedData === 'function' ? getFormattedData() : (document.getElementById('qr-data') ? document.getElementById('qr-data').value : '');
+        if (currentData.trim() !== '') {
             downloadBtn.disabled = false;
         } else {
             downloadBtn.disabled = true;
@@ -263,9 +361,17 @@ document.addEventListener('DOMContentLoaded', () => {
     dropLogout.addEventListener('click', async (e) => {
         e.preventDefault();
         userDropdown.classList.add('hidden');
-        await supabase.auth.signOut();
+        try {
+            await supabase.auth.signOut();
+        } catch (e) {
+            console.warn("Sign out error (likely a mock session):", e);
+        }
+        isLoggedIn = false;
+        currentUser = null;
         isPro = false;
+        isAdmin = false;
         localStorage.removeItem('is_pro');
+        localStorage.removeItem('mock_session');
         updateUIForAuth();
     });
 
@@ -274,17 +380,16 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsMsg.style.display = 'none';
         
         // Populate user data
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-            settingsEmail.value = user.email || '';
-            settingsPhone.value = user.user_metadata?.phone || '';
-            currentPlanText.textContent = isPro ? 'Professional ($19/mo)' : 'Starter ($7/mo)';
-            manageSubBtn.textContent = isPro ? 'Cancel Professional Plan' : 'Upgrade to Professional';
-            manageSubBtn.className = isPro ? 'primary-btn' : 'primary-btn premium-btn';
-            if (isPro) manageSubBtn.style.background = 'rgba(239, 68, 68, 0.1)';
-            if (isPro) manageSubBtn.style.color = '#ef4444';
-            if (isPro) manageSubBtn.style.borderColor = '#ef4444';
-        }
+        const activeUser = currentUser || {};
+        
+        settingsEmail.value = activeUser.email || '';
+        settingsPhone.value = activeUser.user_metadata?.phone || '';
+        currentPlanText.textContent = isPro ? 'Professional ($19/mo)' : 'Free Plan';
+        manageSubBtn.textContent = isPro ? 'Cancel Professional Plan' : 'View Premium Plans';
+        manageSubBtn.className = isPro ? 'primary-btn' : 'primary-btn premium-btn';
+        if (isPro) manageSubBtn.style.background = 'rgba(239, 68, 68, 0.1)';
+        if (isPro) manageSubBtn.style.color = '#ef4444';
+        if (isPro) manageSubBtn.style.borderColor = '#ef4444';
         
         settingsModal.classList.add('active');
     };
@@ -348,27 +453,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     manageSubBtn.addEventListener('click', () => {
-        // Mock Subscription Management
         if (isPro) {
-            isPro = false;
-            localStorage.setItem('is_pro', 'false');
-            showSettingsMsg('Subscription cancelled. You are now on the Starter plan.');
+            // In a real app this would call Stripe billing portal
+            showSettingsMsg('Please contact support to cancel your Professional plan.');
         } else {
-            openCheckoutModal();
             settingsModal.classList.remove('active');
+            document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' });
             return;
         }
         
         // Re-render settings UI
-        currentPlanText.textContent = isPro ? 'Professional ($19/mo)' : 'Starter ($7/mo)';
-        manageSubBtn.textContent = isPro ? 'Cancel Professional Plan' : 'Upgrade to Professional';
+        currentPlanText.textContent = isPro ? 'Professional ($19/mo)' : 'Free Plan';
+        manageSubBtn.textContent = isPro ? 'Cancel Professional Plan' : 'View Premium Plans';
         manageSubBtn.className = isPro ? 'primary-btn' : 'primary-btn premium-btn';
         manageSubBtn.style.background = isPro ? 'rgba(239, 68, 68, 0.1)' : '';
         manageSubBtn.style.color = isPro ? '#ef4444' : '';
         manageSubBtn.style.borderColor = isPro ? '#ef4444' : '';
-        
-        updateUIForAuth();
-    });
+    });      
 
     // --- Checkout Logic ---
     const openCheckoutModal = () => {
@@ -390,10 +491,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
-            // NOTE TO USER: Put your Stripe Payment Link URL here!
-            // E.g. 'https://buy.stripe.com/test_...'
-            const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/REPLACE_ME';
-            
+            // Pull the correct Stripe Payment Link from the button that was clicked
+            const STRIPE_PAYMENT_LINK = btn.getAttribute('data-link') || 'https://buy.stripe.com/aFa6oA1TV22D2VL5qxbMQ01';
+ 
             const email = currentUser?.email || '';
             const finalUrl = `${STRIPE_PAYMENT_LINK}?prefilled_email=${encodeURIComponent(email)}`;
             
@@ -433,7 +533,36 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        savedCodesList.innerHTML = '';
+        let totalScans = 0;
+        let dynamicCount = 0;
+        let staticCount = 0;
+
+        data.forEach(item => {
+            if (item.is_dynamic) {
+                dynamicCount++;
+                totalScans += (item.scan_count || 0);
+            } else {
+                staticCount++;
+            }
+        });
+
+        savedCodesList.innerHTML = `
+            <div class="stats-overview panel-glass" style="margin-bottom: 1.5rem; padding: 1rem; border-radius: 8px; display: flex; justify-content: space-between; text-align: center; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255,255,255,0.1);">
+                <div style="flex: 1;">
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Total Scans</div>
+                    <div style="font-size: 1.8rem; font-weight: 700; color: var(--accent-primary);">${totalScans}</div>
+                </div>
+                <div style="flex: 1; border-left: 1px solid rgba(255,255,255,0.1); border-right: 1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Dynamic QR</div>
+                    <div style="font-size: 1.8rem; font-weight: 700; color: #8b5cf6;">${dynamicCount}</div>
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Static QR</div>
+                    <div style="font-size: 1.8rem; font-weight: 700; color: #10b981;">${staticCount}</div>
+                </div>
+            </div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">Your Saved Codes</h3>
+        `;
         data.forEach(item => {
             const el = document.createElement('div');
             el.className = 'saved-code-item';
@@ -510,8 +639,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const dotStyle = document.getElementById('dot-style') ? document.getElementById('dot-style').value : 'square';
         const cornerStyle = document.getElementById('corner-style') ? document.getElementById('corner-style').value : 'square';
         
-        saveBtn.textContent = 'Saving...';
+        saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-save"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Saving...';
         saveBtn.disabled = true;
+        
+        if (!isPro) {
+            // Check if free user already has 1 saved code
+            const { count, error: countErr } = await supabase.from('saved_qrs').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
+            if (!countErr && count >= 1) {
+                alert('Free Plan limit reached (1 Saved QR Code). Please upgrade to save more codes!');
+                saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-save"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save to Dashboard';
+                saveBtn.disabled = false;
+                return;
+            }
+        }
+        
+        if (currentUser.id === 'hardcoded-admin' || currentUser.id === 'mock-user-123') {
+            // Mock accounts cannot save to the real database due to Foreign Key constraints.
+            // Simulate a successful save for UI testing purposes.
+            saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-save"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Saved (Mock)!';
+            setTimeout(() => {
+                saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-save"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save to Dashboard';
+                saveBtn.disabled = false;
+            }, 2000);
+            return;
+        }
         
         const { data, error } = await supabase.from('saved_qrs').insert({
             user_id: currentUser.id,
@@ -525,7 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }).select();
         
         if (!error && data && data.length > 0) {
-            saveBtn.textContent = 'Saved!';
+            saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-save"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Saved!';
             
             if (isDynamic) {
                 const trackingUrl = `${window.location.origin}/redirect.html?id=${data[0].id}`;
@@ -533,14 +684,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             setTimeout(() => {
-                saveBtn.textContent = 'Save';
+                saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-save"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save to Dashboard';
                 saveBtn.disabled = false;
             }, 2000);
         } else {
             console.error("Error saving QR code:", error);
-            saveBtn.textContent = 'Error';
+            saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-save"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Error';
             setTimeout(() => {
-                saveBtn.textContent = 'Save';
+                saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-save"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save to Dashboard';
                 saveBtn.disabled = false;
             }, 2000);
         }
@@ -733,6 +884,143 @@ document.addEventListener('DOMContentLoaded', () => {
             updateQRCode();
         });
     });
+
+    // --- Support & FAQ Logic ---
+    const faqBtns = document.querySelectorAll('.faq-btn');
+    faqBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const content = btn.nextElementSibling;
+            const icon = btn.querySelector('.faq-icon');
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                icon.textContent = '+';
+            } else {
+                content.style.display = 'block';
+                icon.textContent = '-';
+            }
+        });
+    });
+
+    if (openSupportBtn) {
+        openSupportBtn.addEventListener('click', () => {
+            if (!isLoggedIn) {
+                openModal();
+                return;
+            }
+            supportModal.classList.add('active');
+            supportMsg.textContent = '';
+        });
+    }
+
+    if (closeSupportModalBtn) closeSupportModalBtn.addEventListener('click', () => supportModal.classList.remove('active'));
+
+    if (supportForm) {
+        supportForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const subject = ticketSubject.value.trim();
+            const message = ticketMessage.value.trim();
+            if (!subject || !message) return;
+            
+            const submitBtn = document.getElementById('submit-ticket-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+
+            const { error } = await supabase.from('support_tickets').insert([
+                { user_id: currentUser.id, email: currentUser.email, subject, message }
+            ]);
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Message';
+
+            if (error) {
+                supportMsg.textContent = 'Error sending ticket: ' + error.message;
+                supportMsg.style.color = '#ef4444';
+            } else {
+                supportMsg.textContent = 'Ticket sent! We will review it shortly.';
+                supportMsg.style.color = '#10b981';
+                supportForm.reset();
+                setTimeout(() => supportModal.classList.remove('active'), 2000);
+            }
+        });
+    }
+
+    // --- Admin Dashboard Logic ---
+    if (dropAdmin) {
+        dropAdmin.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!isAdmin) return;
+            adminModal.classList.add('active');
+            userDropdown.classList.add('hidden');
+            loadAdminData();
+        });
+    }
+
+    if (closeAdminModalBtn) closeAdminModalBtn.addEventListener('click', () => adminModal.classList.remove('active'));
+
+    const adminTabs = document.querySelectorAll('.admin-tab-btn');
+    const adminTabContents = document.querySelectorAll('.admin-tab-content');
+    adminTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            adminTabs.forEach(t => t.classList.remove('active'));
+            adminTabContents.forEach(c => c.style.display = 'none');
+            tab.classList.add('active');
+            document.getElementById(`tab-${tab.dataset.tab}`).style.display = 'block';
+        });
+    });
+
+    const loadAdminData = async () => {
+        // Fetch Users
+        const { data: users, error: usersErr } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+        
+        if (usersErr && adminUsersList) {
+            adminUsersList.innerHTML = `<tr><td colspan="4" style="color:#ef4444; padding:1rem;">Error loading users: ${usersErr.message} (Likely blocked by RLS policies)</td></tr>`;
+        } else if (adminUsersList) {
+            if (!users || users.length === 0) {
+                adminUsersList.innerHTML = `<tr><td colspan="4" style="color:var(--text-secondary); padding:1rem;">No users found in the profiles table. If you have users, your Supabase RLS policies might be blocking the Admin from seeing them.</td></tr>`;
+            } else {
+                adminUsersList.innerHTML = users.map(u => `
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <td style="padding: 1rem 0;">${u.email}</td>
+                        <td style="padding: 1rem 0; color: #94a3b8;">${new Date(u.created_at).toLocaleDateString()}</td>
+                        <td style="padding: 1rem 0;">
+                            ${u.is_admin ? '<span class="premium-badge inline-badge" style="background:#8b5cf6;">ADMIN</span>' : (u.is_pro ? '<span class="premium-badge inline-badge" style="background:#10b981;">PRO</span>' : '<span class="premium-badge inline-badge" style="background:#64748b;">FREE</span>')}
+                        </td>
+                        <td style="padding: 1rem 0;">
+                            ${!u.is_admin ? `<button class="secondary-btn" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="window.toggleProStatus('${u.id}', ${u.is_pro})">${u.is_pro ? 'Revoke Pro' : 'Grant Pro'}</button>` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // Fetch Tickets
+        const { data: tickets, error: ticketsErr } = await supabase.from('support_tickets').select('*').order('created_at', { ascending: false });
+        if (!ticketsErr && adminTicketsList) {
+            adminTicketsList.innerHTML = tickets.map(t => `
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <td style="padding: 1rem 0;">${t.email}</td>
+                    <td style="padding: 1rem 0;">${t.subject}</td>
+                    <td style="padding: 1rem 0; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${t.message}">${t.message}</td>
+                    <td style="padding: 1rem 0;">
+                        ${t.status === 'open' ? '<span class="premium-badge inline-badge" style="background:#ef4444;">OPEN</span>' : '<span class="premium-badge inline-badge" style="background:#10b981;">RESOLVED</span>'}
+                    </td>
+                    <td style="padding: 1rem 0;">
+                        ${t.status === 'open' ? `<button class="secondary-btn" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="window.resolveTicket('${t.id}')">Resolve</button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+    };
+
+    window.toggleProStatus = async (userId, currentStatus) => {
+        const { error } = await supabase.from('profiles').update({ is_pro: !currentStatus }).eq('id', userId);
+        if (!error) loadAdminData();
+    };
+
+    window.resolveTicket = async (ticketId) => {
+        const { error } = await supabase.from('support_tickets').update({ status: 'resolved' }).eq('id', ticketId);
+        if (!error) loadAdminData();
+    };
 
     // Initial check
     updateQRCode();
